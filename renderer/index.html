@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自动拉黑商家工具</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 用户信息区域 -->
+        <div class="header">
+            <div class="user-info" id="userInfo">
+                <span class="status-indicator offline"></span>
+                <span class="user-text">未登录</span>
+            </div>
+            <button class="btn btn-login" id="btnLogin" onclick="
+              console.log('Login clicked');
+              console.log('electronAPI:', window.electronAPI);
+              if (window.electronAPI) {
+                console.log('openLoginWindow:', window.electronAPI.openLoginWindow);
+                window.electronAPI.openLoginWindow();
+              } else {
+                console.error('electronAPI not available!');
+              }
+            ">登录</button>
+        </div>
+
+        <!-- 商户ID输入区域 -->
+        <div class="section">
+            <h3>商户ID列表</h3>
+            <p class="hint">每行输入一个商户ID和订单编号，格式：商户ID,订单编号</p>
+            <textarea id="merchantInput" placeholder="例如：
+10209337,122120701128
+10209338,122120701129
+10209339,122120701130"></textarea>
+            <div class="button-group">
+                <button class="btn btn-save" id="btnSave">保存列表</button>
+                <button class="btn btn-clear" id="btnClear">清空</button>
+            </div>
+        </div>
+
+        <!-- 定时设置区域 -->
+        <div class="section">
+            <h3>定时任务设置</h3>
+            <div class="time-setting">
+                <label>执行频率：</label>
+                <span class="freq-value">每分钟执行一次</span>
+            </div>
+        </div>
+
+        <!-- 控制按钮区域 -->
+        <div class="section control-section">
+            <button class="btn btn-start" id="btnStart">启动自动拉黑</button>
+            <button class="btn btn-stop" id="btnStop" disabled>停止</button>
+        </div>
+
+        <!-- 任务状态区域 -->
+        <div class="section">
+            <h3>任务状态</h3>
+            <div class="status-display">
+                <div class="status-item">
+                    <span class="status-label">任务状态：</span>
+                    <span class="status-value" id="taskStatus">未启动</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">下次执行：</span>
+                    <span class="status-value" id="nextRun">--</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">已处理：</span>
+                    <span class="status-value" id="processedCount">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 日志区域 -->
+        <div class="section">
+            <h3>执行日志</h3>
+            <div class="log-container" id="logContainer">
+                <div class="log-item log-info">欢迎使用自动拉黑工具</div>
+            </div>
+        </div>
+
+        <!-- 版本信息 -->
+        <div class="footer">
+            <span id="appVersion"></span>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>
