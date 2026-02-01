@@ -19,11 +19,26 @@ class App {
     try {
       this.showVersion();
       this.bindEvents();
+      this.bindCookieEvents();
       this.loadCookies();
       this.loadMerchantList();
     } catch (error) {
       console.error('Init error:', error);
     }
+  }
+
+  bindCookieEvents() {
+    if (typeof window.electronAPI.onCookiesUpdated !== 'function') return;
+
+    window.electronAPI.onCookiesUpdated((cookies) => {
+      this.cookies = cookies;
+      if (cookies?.uid) {
+        this.addLog('登录信息已更新', 'success');
+      } else {
+        this.addLog('检测到登录信息变更，但信息不完整', 'error');
+      }
+      this.updateUserInfo();
+    });
   }
 
   showVersion() {
@@ -59,12 +74,6 @@ class App {
       btnClear.addEventListener('click', () => this.clearMerchantList());
       btnStart.addEventListener('click', () => this.startTask());
       btnStop.addEventListener('click', () => this.stopTask());
-
-      // 监听 cookies 更新
-      window.electronAPI.onCookiesUpdated((cookies) => {
-        this.cookies = cookies;
-        this.updateUserInfo();
-      });
     } catch (error) {
       console.error('Bind events error:', error);
     }
@@ -72,7 +81,7 @@ class App {
 
   async loadCookies() {
     const cookies = await window.electronAPI.getCookies();
-    if (cookies && cookies.JSESSIONID && cookies.uid) {
+    if (cookies && cookies.uid) {
       this.cookies = cookies;
       this.updateUserInfo();
     }
@@ -126,6 +135,7 @@ class App {
   parseMerchantList(input) {
     this.merchantList = [];
     const lines = input.trim().split('\n');
+    console.log('lines:', lines);
     for (const line of lines) {
       const trimmed = line.trim();
       if (trimmed) {
@@ -144,9 +154,15 @@ class App {
   }
 
   async startTask() {
-    const cookies = await window.electronAPI.getCookies();
-    if (!cookies || !cookies.JSESSIONID || !cookies.uid) {
-      this.addLog('请先登录！', 'error');
+    if (!this.cookies) {
+      const cookies = await window.electronAPI.getCookies();
+      if (cookies && cookies.uid) {
+        this.cookies = cookies;
+      }
+    }
+
+    if (!this.cookies || !this.cookies.uid) {
+      this.addLog('请先登录（需要完整的登录信息）！', 'error');
       return;
     }
 
@@ -186,9 +202,10 @@ class App {
 
   async executeBlacklist() {
     this.addLog('开始执行拉黑任务...', 'info');
-
+    console.log('executeBlacklist', this.merchantList);
     for (const item of this.merchantList) {
       try {
+        console.log('item',  item, this.cookies);
         const result = await window.electronAPI.addToBlacklist(item.orderId, item.merchantId, this.cookies);
         if (result.success) {
           this.addLog(`✓ 商户 ${item.merchantId} 拉黑成功`, 'success');

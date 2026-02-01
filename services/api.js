@@ -103,6 +103,7 @@ class BlacklistService {
           }
         }
       );
+      console.log('addToBlacklist response:', response);
 
       if (response.data && response.data.code === '0000') {
         return {

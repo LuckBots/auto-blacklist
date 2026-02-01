@@ -14,16 +14,7 @@
                 <span class="status-indicator offline"></span>
                 <span class="user-text">未登录</span>
             </div>
-            <button class="btn btn-login" id="btnLogin" onclick="
-              console.log('Login clicked');
-              console.log('electronAPI:', window.electronAPI);
-              if (window.electronAPI) {
-                console.log('openLoginWindow:', window.electronAPI.openLoginWindow);
-                window.electronAPI.openLoginWindow();
-              } else {
-                console.error('electronAPI not available!');
-              }
-            ">登录</button>
+            <button class="btn btn-login" id="btnLogin" >登录</button>
         </div>
 
         <!-- 商户ID输入区域 -->

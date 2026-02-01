@@ -214,25 +214,25 @@ async function captureCookies() {
   console.log('[captureCookies] All cookie names:', allCookies.map(c => c.name).join(', '));
 
   const cookies = await loginWindow.webContents.session.cookies.get({
-    domain: '.uhaozu.com'
   });
 
-  console.log('[captureCookies] Found .uhaozu.com cookies:', cookies.length);
+  console.log('[captureCookies] Found .uhaozu.com cookies:', cookies);
 
   const cookieObj = {};
   cookies.forEach(cookie => {
-    if (cookie.name === 'JSESSIONID' || cookie.name === 'uid') {
+    if (cookie.name === 'uid' || cookie.name === 'JSESSIONID') {
       cookieObj[cookie.name] = cookie.value;
       console.log('[captureCookies] Found cookie:', cookie.name, '=', cookie.value?.substring(0, 20) + '...');
     }
   });
 
-  console.log('[captureCookies] cookieObj.JSESSIONID:', !!cookieObj.JSESSIONID, 'cookieObj.uid:', !!cookieObj.uid);
-
+  console.log('[captureCookies] cookieObj:', cookieObj);
   // 只要获取到必需的 cookies 就保存并关闭窗口
-  if (cookieObj.JSESSIONID && cookieObj.uid) {
-    console.log('[captureCookies] Both cookies found, saving and closing window');
+  if (cookieObj.uid && cookieObj.JSESSIONID) {
+    console.log('[captureCookies] Required cookies found, saving and closing window');
+
     const cookiePath = path.join(app.getPath('userData'), 'cookies.json');
+    console.log('[captureCookies] Saving cookies to', cookiePath);
     fs.writeFileSync(cookiePath, JSON.stringify(cookieObj, null, 2));
 
     if (mainWindow) {
